@@ -27,6 +27,15 @@ TEMP = 'gs://machine-learning-workspace/motor-vehicle-crashes/temp'
 #     --region us-central1 \
 #     --temp_location gs://machine-learning-workspace/motor-vehicle-crashes/temp/
 
+# or
+# python -m dataflow_runner \
+#     --service_account_email dataflow@nyc-transit-426211.iam.gserviceaccount.com \   
+#     --input gs://motor-vehicle-crashes/collisions/2024-01-01/data.json \
+#     --output gs://motor-vehicle-crashes/staging/ \
+#     --runner DataflowRunner \
+#     --project nyc-transit-426211 \
+#     --region us-central1 \
+#     --temp_location gs://motor-vehicle-crashes/temp/
 
 # Output PCollection
 class Output(beam.PTransform):
@@ -44,12 +53,12 @@ def main(argv=None, save_main_session=True):
     parser.add_argument(
         '--input',
         dest='input',
-        default=input,
+        default='gs://motor-vehicle-crashes/collisions/2024-01-01/data.json',
         help='Input file to process.')
     parser.add_argument(
         '--output',
         dest='output',
-        required=True,
+        # required=True,
         help='Output file to write results to.')
     known_args, pipeline_args = parser.parse_known_args(argv)
 
