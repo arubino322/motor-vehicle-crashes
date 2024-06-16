@@ -12,30 +12,11 @@ from apache_beam.io import WriteToText
 from apache_beam.options.pipeline_options import PipelineOptions
 from apache_beam.options.pipeline_options import SetupOptions
 
-PROJECT_ID = 'prime-odyssey-415016'
+PROJECT_ID = 'nyc-transit-426211'
 REGION = 'us-central1'
-STAGING = 'gs://machine-learning-workspace/motor-vehicle-crashes/collisions/2024-01-01/data.json'
-TEMP = 'gs://machine-learning-workspace/motor-vehicle-crashes/temp'
+INPUT = 'gs://motor-vehicle-crashes/collisions/2024-01-01/data.json'
+TEMP = 'gs://motor-vehicle-crashes/temp'
 # HOME?
-
-# example command:
-# python -m dataflow_runner \
-#     --input gs://machine-learning-workspace/motor-vehicle-crashes/collisions/2024-01-01/data.json \
-#     --output gs://machine-learning-workspace/motor-vehicle-crashes/staging/ \
-#     --runner DataflowRunner \
-#     --project prime-odyssey-415016 \
-#     --region us-central1 \
-#     --temp_location gs://machine-learning-workspace/motor-vehicle-crashes/temp/
-
-# or
-# python -m dataflow_runner \
-#     --service_account_email dataflow@nyc-transit-426211.iam.gserviceaccount.com \   
-#     --input gs://motor-vehicle-crashes/collisions/2024-01-01/data.json \
-#     --output gs://motor-vehicle-crashes/staging/ \
-#     --runner DataflowRunner \
-#     --project nyc-transit-426211 \
-#     --region us-central1 \
-#     --temp_location gs://motor-vehicle-crashes/temp/
 
 # Output PCollection
 class Output(beam.PTransform):
@@ -53,7 +34,7 @@ def main(argv=None, save_main_session=True):
     parser.add_argument(
         '--input',
         dest='input',
-        default='gs://motor-vehicle-crashes/collisions/2024-01-01/data.json',
+        default=INPUT,
         help='Input file to process.')
     parser.add_argument(
         '--output',
@@ -64,7 +45,15 @@ def main(argv=None, save_main_session=True):
 
     # We use the save_main_session option because one or more DoFn's in this
     # workflow rely on global context (e.g., a module imported at module level).
-    pipeline_options = PipelineOptions(pipeline_args)
+    # pipeline_options = PipelineOptions(pipeline_args)
+    pipeline_options = PipelineOptions(
+        pipeline_args,
+        runner='DataflowRunner',
+        project=PROJECT_ID,
+        # job_name=''
+        temp_location=TEMP,
+        region=REGION
+    )
     pipeline_options.view_as(SetupOptions).save_main_session = save_main_session
 
     with beam.Pipeline(options=pipeline_options) as p:
