@@ -1,7 +1,6 @@
-import base64
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import requests
 from flask import Request
@@ -11,10 +10,6 @@ from google.cloud import bigquery
 def fetch_and_store(request: Request):
     if request.method == 'POST':
         request_json = request.get_json(silent=True)
-        if request_json and 'start_date' in request_json:
-            dt = request_json['start_date']
-        else:
-            return 'Invalid request: missing start_date or end_date', 400
     else:
         return 'Invalid request method', 405
     
@@ -24,7 +19,8 @@ def fetch_and_store(request: Request):
     api_key, secret_key = os.environ['NYCT_API_KEY'], os.environ['NYCT_SECRET_KEY']
 
     # Define API endpoint and params
-    url = f"https://data.cityofnewyork.us/resource/f55k-p6yu.json?$where=crash_date = '{dt}T00:00:00'"
+    collision_dt = (datetime.today() - timedelta(days=6)).strftime('%Y-%m-%d')
+    url = f"https://data.cityofnewyork.us/resource/f55k-p6yu.json?$where=crash_date = '{collision_dt}'"
     response = requests.get(url, auth=(api_key, secret_key))
     if response.status_code != 200:
         return f"Error fetching data: {response.status_code}, {response.text}"
