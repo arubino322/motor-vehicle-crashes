@@ -28,7 +28,7 @@ def insert_data(client, dt, table, api_key, secret_key, schema):
     }
     endpoint = endpoint_mapping[table]
 
-    url = f"https://data.cityofnewyork.us/resource/{endpoint}.json?$where=crash_date = '{dt}T00:00:00'"
+    url = f"https://data.cityofnewyork.us/resource/{endpoint}.json?$where=crash_date = '{dt}T00:00:00' limit 50000"
     response = requests.get(url, auth=(api_key, secret_key))
     if response.status_code != 200:
         return f"Error fetching data: {response.status_code}, {response.text}"
