@@ -1,2 +1,5 @@
 .venv/
 data/
+
+# Python
+src/__pycache__/
