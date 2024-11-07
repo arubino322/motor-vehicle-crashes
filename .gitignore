@@ -3,3 +3,4 @@ data/
 
 # Python
 src/__pycache__/
+.streamlit/
